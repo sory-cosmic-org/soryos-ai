@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=SoryOS AI Assistant
+Comment=Assistant IA desktop natif de SoryOS
+Exec=/home/sory/Bureau/sory-os-ia/target/debug/soryos-desktop-gui
+Path=/home/sory/Bureau/sory-os-ia
+Terminal=false
+Type=Application
+Categories=Utility;ArtificialIntelligence;
+StartupNotify=true

@@ -1,0 +1,7 @@
+/target/
+data/*.db
+data/*.db-journal
+.env
+sysroot/
+*.deb
+reference-a-etudier-pour-soryos/

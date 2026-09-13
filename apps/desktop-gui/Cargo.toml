@@ -1,0 +1,25 @@
+[package]
+name = "soryos-desktop-gui"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "soryos-desktop-gui"
+path = "src/main.rs"
+
+[dependencies]
+assistant-core.workspace = true
+ai-providers.workspace = true
+soryos-voice.workspace = true
+soryos-tools.workspace = true
+soryos-security.workspace = true
+soryos-storage.workspace = true
+soryos-ui.workspace = true
+tokio.workspace = true
+futures.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+serde_json.workspace = true
+async-trait.workspace = true
+cosmic = { git = "https://github.com/pop-os/libcosmic", rev = "0304f1d92e2d2db4b05624d9ba827cca03c0407d", package = "libcosmic", features = ["wgpu"] }

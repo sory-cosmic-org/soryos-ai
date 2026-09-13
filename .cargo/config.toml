@@ -1,0 +1,8 @@
+# Local build configuration for SoryOS AI Assistant.
+#
+# The COSMIC GUI needs xkbcommon headers at build time. On systems without
+# root access, extract `libxkbcommon-dev` into `./sysroot` (see README) —
+# these variables point pkg-config and the linker at it.
+
+[env]
+PKG_CONFIG_PATH = { value = "sysroot/usr/lib/x86_64-linux-gnu/pkgconfig", relative = true, force = true }

@@ -1,0 +1,22 @@
+# SoryOS AI Assistant — example configuration (non-secret only).
+# Copy to `soryos.toml` next to the binary or into the data dir.
+# Secrets always come from environment variables (see .env.example).
+
+[assistant]
+default_provider = "mock"
+default_model = ""
+temperature = 0.7
+max_tokens = 1024
+max_history = 40
+max_tool_iterations = 5
+system_prompt = "Tu es SoryOS AI, l'assistant personnel natif de SoryOS. Tu réponds de façon claire, concise et utile."
+
+[voice]
+enabled = true
+stt_provider = "mock"
+tts_provider = "mock"
+
+[security]
+shell_requires_confirmation = true
+filesystem_write_requires_confirmation = true
+filesystem_sandbox = ""
