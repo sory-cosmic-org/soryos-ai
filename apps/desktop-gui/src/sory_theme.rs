@@ -126,15 +126,8 @@ pub const STATUS_BAR_HEIGHT: f32 = 28.0;
 
 // ── Text Style Helper ──
 //
-// libcosmic's iced text widget `.style()` takes `impl Fn(&Theme) -> iced::widget::text::Style`,
-// not a plain Color. This helper wraps a Color into a closure compatible with `.style()`.
-
-pub fn colored(color: Color) -> impl Fn(&Theme) -> cosmic::iced::widget::text::Style {
-    move |_theme: &Theme| cosmic::iced::widget::text::Style {
-        color: Some(color),
-        selected_fill: color,
-    }
-}
+// libcosmic's iced text widget uses `.class(color)` for text colors
+// (`From<Color> for cosmic::theme::Text`), not `.style()`.
 
 // ── Container Styles ──
 

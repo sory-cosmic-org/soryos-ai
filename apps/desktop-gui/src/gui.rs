@@ -13,9 +13,7 @@ use assistant_core::{
 use cosmic::app::{ApplicationExt, Core, Task};
 use cosmic::iced::{Length, Subscription};
 use cosmic::{executor, iced, widget, Action, Application, Element};
-use soryos_ui::{
-    chat::role_label, group_history, sidebar::summarize, App as UiApp, Effect, UiEvent,
-};
+use soryos_ui::{group_history, sidebar::summarize, App as UiApp, Effect, UiEvent};
 
 use crate::ctx::{self, GuiCtx, GuiEvent};
 use crate::envfile;
@@ -339,7 +337,7 @@ impl SoryApp {
 
         let logo = widget::Row::new()
             .push(
-                widget::container(widget::text::heading("S").style(st::ACCENT))
+                widget::container(widget::text::heading("S").class(st::ACCENT))
                     .width(Length::Fixed(36.0))
                     .height(Length::Fixed(36.0))
                     .center_x(Length::Fill)
@@ -348,7 +346,9 @@ impl SoryApp {
             .push(
                 widget::Column::new()
                     .push(widget::text::heading("SoryOS"))
-                    .push(widget::text::caption("Votre assistant IA, plus intelligent."))
+                    .push(widget::text::caption(
+                        "Votre assistant IA, plus intelligent.",
+                    ))
                     .spacing(2),
             )
             .spacing(10)
@@ -364,15 +364,14 @@ impl SoryApp {
 
         let mut nav_column = widget::Column::new().spacing(2);
         for (id, label, _) in nav_items {
-            let is_active = self.active_nav == id;
+            let _is_active = self.active_nav == id;
             let btn = widget::button::text(label)
                 .on_press(Message::NavigateTo(id.to_string()))
                 .width(Length::Fill);
-            let btn = if is_active { btn } else { btn };
             nav_column = nav_column.push(btn);
         }
 
-        let shortcuts_label = widget::text::caption("RACCOURCIS").style(st::colored(st::TEXT_TERTIARY));
+        let shortcuts_label = widget::text::caption("RACCOURCIS").class(st::TEXT_TERTIARY);
 
         let shortcut_items = [
             ("new_chat", "+ Nouveau chat"),
@@ -393,7 +392,7 @@ impl SoryApp {
             );
         }
 
-        let history_label = widget::text::caption("CONVERSATIONS").style(st::colored(st::TEXT_TERTIARY));
+        let history_label = widget::text::caption("CONVERSATIONS").class(st::TEXT_TERTIARY);
         let search = widget::text_input::search_input("Rechercher…", &self.history_filter)
             .on_input(Message::HistoryFilterChanged);
         let history = history_view(&state.conversations, &self.history_filter, state.active_id);
@@ -401,7 +400,7 @@ impl SoryApp {
         let user_area = widget::container(
             widget::Row::new()
                 .push(
-                    widget::container(widget::text::body("S").style(st::ACCENT))
+                    widget::container(widget::text::body("S").class(st::ACCENT))
                         .width(Length::Fixed(32.0))
                         .height(Length::Fixed(32.0))
                         .center_x(Length::Fill)
@@ -442,6 +441,7 @@ impl SoryApp {
             .width(Length::Fixed(st::SIDEBAR_WIDTH))
             .height(Length::Fill)
             .style(st::sidebar_bg)
+            .into()
     }
 
     // ─────────── CENTER ───────────
@@ -451,20 +451,20 @@ impl SoryApp {
 
         let top_bar = widget::container(
             widget::Row::new()
-                .push(widget::text::body("🔍").style(st::colored(st::TEXT_SECONDARY)))
+                .push(widget::text::body("🔍").class(st::TEXT_SECONDARY))
                 .push(spacer_w(4.0))
                 .push(
-                    widget::text_input::search_input("Rechercher sur SoryOS…", &String::new())
+                    widget::text_input::search_input("Rechercher sur SoryOS…", String::new())
                         .on_input(|_| Message::Ignore),
                 )
                 .push(spacer_fill())
-                .push(widget::text::body("☀").style(st::colored(st::TEXT_SECONDARY)))
+                .push(widget::text::body("☀").class(st::TEXT_SECONDARY))
                 .push(spacer_w(8.0))
-                .push(widget::text::body("🔔").style(st::colored(st::TEXT_SECONDARY)))
+                .push(widget::text::body("🔔").class(st::TEXT_SECONDARY))
                 .push(spacer_w(8.0))
-                .push(widget::text::body("Utilisateur").style(st::colored(st::TEXT_PRIMARY)))
+                .push(widget::text::body("Utilisateur").class(st::TEXT_PRIMARY))
                 .push(spacer_w(4.0))
-                .push(widget::text::caption("En ligne").style(st::colored(st::STATUS_GREEN)))
+                .push(widget::text::caption("En ligne").class(st::STATUS_GREEN))
                 .spacing(4)
                 .align_y(iced::Alignment::Center),
         )
@@ -498,11 +498,11 @@ impl SoryApp {
     }
 
     fn welcome_view(&self) -> Element<'_, Message> {
-        let logo = widget::container(widget::text::heading("S").style(st::colored(st::ACCENT)))
-        .width(Length::Fixed(120.0))
-        .height(Length::Fixed(120.0))
-        .center_x(Length::Fill)
-        .center_y(Length::Fill);
+        let logo = widget::container(widget::text::heading("S").class(st::ACCENT))
+            .width(Length::Fixed(120.0))
+            .height(Length::Fixed(120.0))
+            .center_x(Length::Fill)
+            .center_y(Length::Fill);
 
         let cards = widget::Row::new()
             .push(self.action_card(
@@ -532,11 +532,11 @@ impl SoryApp {
             .push(spacer_h(40.0))
             .push(logo)
             .push(spacer_h(16.0))
-            .push(widget::text::heading("SoryOS").style(st::colored(st::TEXT_PRIMARY)))
+            .push(widget::text::heading("SoryOS").class(st::TEXT_PRIMARY))
             .push(spacer_h(6.0))
             .push(
                 widget::text::body("Votre assistant IA, plus intelligent.")
-                    .style(st::colored(st::TEXT_SECONDARY)),
+                    .class(st::TEXT_SECONDARY),
             )
             .push(spacer_h(32.0))
             .push(cards)
@@ -546,13 +546,18 @@ impl SoryApp {
             .into()
     }
 
-    fn action_card(&self, icon: &str, title: &str, desc: &str) -> Element<'_, Message> {
+    fn action_card<'a>(
+        &self,
+        icon: &'a str,
+        title: &'a str,
+        desc: &'a str,
+    ) -> Element<'a, Message> {
         let content = widget::Column::new()
-            .push(widget::text::heading(icon).style(st::colored(st::ACCENT)))
+            .push(widget::text::heading(icon).class(st::ACCENT))
             .push(spacer_h(12.0))
-            .push(widget::text::body(title).style(st::colored(st::TEXT_PRIMARY)))
+            .push(widget::text::body(title).class(st::TEXT_PRIMARY))
             .push(spacer_h(4.0))
-            .push(widget::text::caption(desc).style(st::colored(st::TEXT_SECONDARY)))
+            .push(widget::text::caption(desc).class(st::TEXT_SECONDARY))
             .spacing(0)
             .width(Length::Fill);
 
@@ -571,7 +576,7 @@ impl SoryApp {
             if message.role == MessageRole::System {
                 continue;
             }
-            messages = messages.push(message_bubble(message));
+            messages = messages.push(message_bubble(&message));
         }
 
         if let Some(pending) = &self.pending_confirm {
@@ -588,28 +593,27 @@ impl SoryApp {
         let state = self.ui.state();
         let generating = state.chat.generating;
 
-        let input =
-            widget::text_input::text_input("Écrivez votre message à SoryOS…", &state.input)
-                .on_input(Message::InputChanged)
-                .on_submit(|_| Message::Send);
+        let input = widget::text_input::text_input("Écrivez votre message à SoryOS…", &state.input)
+            .on_input(Message::InputChanged)
+            .on_submit(|_| Message::Send);
 
         let send_btn = if generating {
-            widget::button::custom(widget::text::body("⏹").style(st::colored(st::TEXT_PRIMARY)))
+            widget::button::custom(widget::text::body("⏹").class(st::TEXT_PRIMARY))
                 .on_press(Message::Stop)
         } else {
-            widget::button::custom(widget::text::body("➤").style(st::colored(st::TEXT_PRIMARY)))
+            widget::button::custom(widget::text::body("➤").class(st::TEXT_PRIMARY))
                 .on_press(Message::Send)
         };
 
         let input_row = widget::Row::new()
-            .push(widget::text::body("📎").style(st::colored(st::TEXT_SECONDARY)))
+            .push(widget::text::body("📎").class(st::TEXT_SECONDARY))
             .push(spacer_w(4.0))
             .push(input.width(Length::Fill))
             .push(spacer_w(4.0))
-            .push(widget::text::body("⚙").style(st::colored(st::TEXT_SECONDARY)))
+            .push(widget::text::body("⚙").class(st::TEXT_SECONDARY))
             .push(spacer_w(4.0))
             .push(
-                widget::button::custom(widget::text::body("🎤").style(st::colored(st::TEXT_SECONDARY)))
+                widget::button::custom(widget::text::body("🎤").class(st::TEXT_SECONDARY))
                     .on_press(Message::VoicePressed),
             )
             .push(spacer_w(4.0))
@@ -646,13 +650,13 @@ impl SoryApp {
             widget::Row::new()
                 .push(
                     widget::Row::new()
-                        .push(widget::text::body("●").style(dot_color))
+                        .push(widget::text::body("●").class(dot_color))
                         .push(spacer_w(6.0))
-                        .push(widget::text::caption(status_text).style(st::colored(st::TEXT_SECONDARY)))
+                        .push(widget::text::caption(status_text).class(st::TEXT_SECONDARY))
                         .align_y(iced::Alignment::Center),
                 )
                 .push(spacer_fill())
-                .push(widget::text::caption("SoryOS v1.0").style(st::colored(st::TEXT_TERTIARY)))
+                .push(widget::text::caption("SoryOS v1.0").class(st::TEXT_TERTIARY))
                 .align_y(iced::Alignment::Center),
         )
         .padding(iced::Padding::from([4, 16]))
@@ -666,17 +670,17 @@ impl SoryApp {
 
     fn right_panel_view(&self) -> Element<'_, Message> {
         let active_provider = self.active_provider_name();
-        let active_model = self.active_model_label();
+        let _active_model = self.active_model_label();
 
-        let provider_label = widget::text::caption("Modèle IA").style(st::colored(st::TEXT_SECONDARY));
+        let provider_label = widget::text::caption("Modèle IA").class(st::TEXT_SECONDARY);
 
         let provider_selector = widget::button::custom(
             widget::Row::new()
-                .push(widget::text::body("⇄").style(st::colored(st::TEXT_PRIMARY)))
+                .push(widget::text::body("⇄").class(st::TEXT_PRIMARY))
                 .push(spacer_w(6.0))
-                .push(widget::text::body(&active_provider).style(st::colored(st::TEXT_PRIMARY)))
+                .push(widget::text::body(active_provider.clone()).class(st::TEXT_PRIMARY))
                 .push(spacer_fill())
-                .push(widget::text::body("▾").style(st::colored(st::TEXT_SECONDARY)))
+                .push(widget::text::body("▾").class(st::TEXT_SECONDARY))
                 .align_y(iced::Alignment::Center),
         )
         .on_press(Message::ToggleModelSelector)
@@ -685,7 +689,7 @@ impl SoryApp {
         let auto_free = widget::container(
             widget::Row::new()
                 .push(
-                    widget::container(widget::text::body("⚡").style(st::ACCENT))
+                    widget::container(widget::text::body("⚡").class(st::ACCENT))
                         .width(Length::Fixed(40.0))
                         .height(Length::Fixed(40.0))
                         .center_x(Length::Fill)
@@ -696,17 +700,17 @@ impl SoryApp {
                         .push(
                             widget::Row::new()
                                 .push(
-                                    widget::text::body("Automatic — Free").style(st::colored(st::TEXT_PRIMARY)),
+                                    widget::text::body("Automatic — Free").class(st::TEXT_PRIMARY),
                                 )
                                 .push(spacer_w(6.0))
-                                .push(widget::text::caption("FREE").style(st::colored(st::SUCCESS)))
+                                .push(widget::text::caption("FREE").class(st::SUCCESS))
                                 .align_y(iced::Alignment::Center),
                         )
                         .push(
                             widget::text::caption(
                                 "OpenRouter choisit automatiquement parmi les modèles gratuits",
                             )
-                            .style(st::colored(st::TEXT_SECONDARY)),
+                            .class(st::TEXT_SECONDARY),
                         )
                         .spacing(4),
                 )
@@ -719,7 +723,7 @@ impl SoryApp {
 
         let model_search = widget::container(
             widget::Row::new()
-                .push(widget::text::body("🔍").style(st::colored(st::TEXT_SECONDARY)))
+                .push(widget::text::body("🔍").class(st::TEXT_SECONDARY))
                 .push(spacer_w(6.0))
                 .push(
                     widget::text_input::text_input("Rechercher un modèle…", "")
@@ -731,7 +735,7 @@ impl SoryApp {
         .width(Length::Fill)
         .style(st::search_bar);
 
-        let models_label = widget::text::caption("Modèles gratuits").style(st::colored(st::TEXT_SECONDARY));
+        let models_label = widget::text::caption("Modèles gratuits").class(st::TEXT_SECONDARY);
 
         let mut models_list = widget::Column::new().spacing(4);
 
@@ -741,17 +745,17 @@ impl SoryApp {
                 models_list = models_list.push(
                     widget::container(
                         widget::Row::new()
-                            .push(widget::text::body("●").style(st::ACCENT))
+                            .push(widget::text::body("●").class(st::ACCENT))
                             .push(spacer_w(6.0))
                             .push(
                                 widget::Column::new()
                                     .push(
                                         widget::text::body(format!("{display_name} (free)"))
-                                            .style(st::colored(st::TEXT_PRIMARY)),
+                                            .class(st::TEXT_PRIMARY),
                                     )
                                     .push(
                                         widget::text::caption(model_info(model))
-                                            .style(st::colored(st::TEXT_SECONDARY)),
+                                            .class(st::TEXT_SECONDARY),
                                     )
                                     .spacing(2)
                                     .width(Length::Fill),
@@ -759,7 +763,7 @@ impl SoryApp {
                             .push(spacer_fill())
                             .push(
                                 widget::button::custom(
-                                    widget::text::caption("FREE").style(st::colored(st::SUCCESS)),
+                                    widget::text::caption("FREE").class(st::SUCCESS),
                                 )
                                 .on_press(Message::UseModel(model.clone())),
                             )
@@ -782,7 +786,7 @@ impl SoryApp {
         let free_note = widget::text::caption(
             "Seuls les modèles gratuits sont affichés.\nAucun modèle payant n'est disponible.",
         )
-        .style(st::colored(st::TEXT_TERTIARY));
+        .class(st::TEXT_TERTIARY);
 
         let tools_section = self.section_row("🔧", "Outils", "8 outils activés", st::SUCCESS);
         let files_section =
@@ -824,25 +828,25 @@ impl SoryApp {
             .into()
     }
 
-    fn section_row(
+    fn section_row<'a>(
         &self,
-        icon: &str,
-        title: &str,
-        subtitle: &str,
+        icon: &'a str,
+        title: &'a str,
+        subtitle: &'a str,
         color: iced::Color,
-    ) -> Element<'_, Message> {
+    ) -> Element<'a, Message> {
         let content = widget::Row::new()
-            .push(widget::text::body(icon).style(color))
+            .push(widget::text::body(icon).class(color))
             .push(spacer_w(10.0))
             .push(
                 widget::Column::new()
-                    .push(widget::text::body(title).style(st::colored(st::TEXT_PRIMARY)))
-                    .push(widget::text::caption(subtitle).style(st::colored(st::TEXT_SECONDARY)))
+                    .push(widget::text::body(title).class(st::TEXT_PRIMARY))
+                    .push(widget::text::caption(subtitle).class(st::TEXT_SECONDARY))
                     .spacing(2)
                     .width(Length::Fill),
             )
             .push(spacer_fill())
-            .push(widget::text::body("›").style(st::colored(st::TEXT_SECONDARY)))
+            .push(widget::text::body("›").class(st::TEXT_SECONDARY))
             .spacing(4)
             .align_y(iced::Alignment::Center);
 
@@ -895,7 +899,7 @@ impl SoryApp {
         if name == "openrouter" {
             panel = panel.push(
                 widget::text::caption("Free only : seuls les modèles gratuits seront utilisés.")
-                    .style(st::colored(st::TEXT_SECONDARY)),
+                    .class(st::TEXT_SECONDARY),
             );
         }
         let key_set = envfile::provider_env_vars(name)
@@ -907,7 +911,7 @@ impl SoryApp {
             } else {
                 "Clé API : absente"
             })
-            .style(st::colored(st::TEXT_SECONDARY)),
+            .class(st::TEXT_SECONDARY),
         );
 
         let key_field = if self.show_key {
@@ -958,7 +962,7 @@ impl SoryApp {
             if let Some(models) = self.provider_models.get("openrouter") {
                 panel = panel.push(
                     widget::text::caption(format!("{} modèles gratuits", models.len()))
-                        .style(st::colored(st::TEXT_SECONDARY)),
+                        .class(st::TEXT_SECONDARY),
                 );
             }
         }
@@ -1398,12 +1402,12 @@ fn history_view<'a>(
         } else {
             "Aucun résultat."
         })
-        .style(st::colored(st::TEXT_TERTIARY))
+        .class(st::TEXT_TERTIARY)
         .into();
     }
     let mut column = widget::Column::new().spacing(4);
     for group in groups {
-        column = column.push(widget::text::caption(group.label).style(st::colored(st::TEXT_TERTIARY)));
+        column = column.push(widget::text::caption(group.label).class(st::TEXT_TERTIARY));
         for item in group.items {
             let mark = if Some(item.id) == active { "▌" } else { " " };
             column = column.push(
@@ -1432,18 +1436,18 @@ fn message_bubble(message: &ChatMessage) -> Element<'static, Message> {
     let mut content = widget::Column::new()
         .push(
             widget::Row::new()
-                .push(widget::text::caption(label).style(st::colored(st::TEXT_SECONDARY)))
+                .push(widget::text::caption(label).class(st::TEXT_SECONDARY))
                 .spacing(10)
                 .align_y(iced::Alignment::Center),
         )
-        .push(spacer_h(4))
-        .push(widget::text::body(message.content.clone()).style(st::colored(st::TEXT_PRIMARY)))
+        .push(spacer_h(4.0))
+        .push(widget::text::body(message.content.clone()).class(st::TEXT_PRIMARY))
         .spacing(4);
 
     for call in &message.tool_calls {
         content = content.push(
             widget::text::caption(format!("outil: {} {}", call.name, call.arguments))
-                .style(st::colored(st::TEXT_TERTIARY)),
+                .class(st::TEXT_TERTIARY),
         );
     }
 
@@ -1460,12 +1464,12 @@ fn confirm_card(pending: &PendingConfirm) -> Element<'_, Message> {
             "L'assistant veut exécuter « {} ».",
             pending.tool
         )))
-        .push(widget::text::caption(pending.reason.clone()).style(st::colored(st::TEXT_SECONDARY)))
-        .push(spacer_h(8))
+        .push(widget::text::caption(pending.reason.clone()).class(st::TEXT_SECONDARY))
+        .push(spacer_h(8.0))
         .push(
             widget::Row::new()
                 .push(widget::button::suggested("Autoriser").on_press(Message::ConfirmAllow))
-                .push(spacer_w(8))
+                .push(spacer_w(8.0))
                 .push(widget::button::text("Refuser").on_press(Message::ConfirmDeny))
                 .spacing(8),
         )
